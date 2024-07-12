@@ -16,6 +16,7 @@ package net.caffeinemc.mods.sodium.client.util;
  * 31                                      Padding              1 byte
  */
 public class ModelQuadUtil {
+
     // Integer indices for vertex attributes, useful for accessing baked quad data
     public static final int POSITION_INDEX = 0,
             COLOR_INDEX = 3,
@@ -33,4 +34,5 @@ public class ModelQuadUtil {
     public static int vertexOffset(int vertexIndex) {
         return vertexIndex * VERTEX_SIZE;
     }
+
 }

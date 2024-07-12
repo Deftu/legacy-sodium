@@ -19,7 +19,7 @@ import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.Transl
 import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.data.PresentTranslucentData;
 import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.data.TranslucentData;
 import net.caffeinemc.mods.sodium.client.util.task.CancellationToken;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.client.world.WorldSlice;
 import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
@@ -63,7 +63,7 @@ public class ChunkBuilderMeshingTask extends ChunkBuilderTask<ChunkBuildOutput> 
         BlockRenderCache cache = buildContext.cache;
         cache.init(this.renderContext);
 
-        LevelSlice slice = cache.getWorldSlice();
+        WorldSlice slice = cache.getWorldSlice();
 
         int minX = this.render.getOriginX();
         int minY = this.render.getOriginY();
@@ -192,7 +192,7 @@ public class ChunkBuilderMeshingTask extends ChunkBuilderTask<ChunkBuildOutput> 
         return output;
     }
 
-    private ReportedException fillCrashInfo(CrashReport report, LevelSlice slice, BlockPos pos) {
+    private ReportedException fillCrashInfo(CrashReport report, WorldSlice slice, BlockPos pos) {
         CrashReportCategory crashReportSection = report.addCategory("Block being rendered", 1);
 
         BlockState state = null;

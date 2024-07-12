@@ -1,6 +1,5 @@
 package net.caffeinemc.mods.sodium.client.world;
 
-import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import net.caffeinemc.mods.sodium.client.world.biome.LevelColorCache;
 import net.caffeinemc.mods.sodium.client.world.biome.BiomeColorSource;
 import net.caffeinemc.mods.sodium.client.world.biome.BiomeColorView;
@@ -8,28 +7,11 @@ import net.caffeinemc.mods.sodium.client.world.biome.LevelBiomeSlice;
 import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
 import net.caffeinemc.mods.sodium.client.world.cloned.ClonedChunkSection;
 import net.caffeinemc.mods.sodium.client.world.cloned.ClonedChunkSectionCache;
-import net.fabricmc.fabric.api.rendering.data.v1.RenderAttachedBlockView;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Holder;
-import net.minecraft.core.SectionPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.ColorResolver;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.DataLayer;
-import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.level.chunk.LevelChunkSection;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import net.minecraft.world.level.lighting.LevelLightEngine;
-import net.minecraft.world.level.material.FluidState;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.World;
+import net.minecraft.world.WorldType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,8 +28,9 @@ import java.util.Objects;
  *
  * <p>Object pooling should be used to avoid huge allocations as this class contains many large arrays.</p>
  */
-public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, RenderAttachedBlockView {
-    private static final LightLayer[] LIGHT_TYPES = LightLayer.values();
+public final class WorldSlice implements BiomeColorView {
+
+    private static final EnumSkyBlock[] LIGHT_TYPES = EnumSkyBlock.values();
 
     // The number of blocks in a section.
     private static final int SECTION_BLOCK_COUNT = 16 * 16 * 16;
@@ -56,7 +39,7 @@ public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, Ren
     private static final int NEIGHBOR_BLOCK_RADIUS = 2;
 
     // The radius of chunks around the origin chunk that should be copied.
-    private static final int NEIGHBOR_CHUNK_RADIUS = Mth.roundToward(NEIGHBOR_BLOCK_RADIUS, 16) >> 4;
+    private static final int NEIGHBOR_CHUNK_RADIUS = MathHelper.roundUp(NEIGHBOR_BLOCK_RADIUS, 16) >> 4;
 
     // The number of sections on each axis of this slice.
     private static final int SECTION_ARRAY_LENGTH = 1 + (NEIGHBOR_CHUNK_RADIUS * 2);
@@ -67,11 +50,10 @@ public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, Ren
     // The number of bits needed for each local X/Y/Z coordinate.
     private static final int LOCAL_XYZ_BITS = 4;
 
-    // The default block state used for out-of-bounds access
-    private static final BlockState EMPTY_BLOCK_STATE = Blocks.AIR.defaultBlockState();
-
     // The level this slice has copied data from
-    private final ClientLevel level;
+    private final World world;
+    private final WorldType worldType;
+    private final int[] defaultSkyLightValue;
 
     // The accessor used for fetching biome data from the slice
     private final LevelBiomeSlice biomeSlice;
@@ -139,21 +121,13 @@ public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, Ren
     }
 
     @SuppressWarnings("unchecked")
-    public LevelSlice(ClientLevel level) {
-        this.level = level;
+    public WorldSlice(World world) {
+        this.world = world;
+        this.worldType = world.getWorldType();
 
-        this.blockArrays = new BlockState[SECTION_ARRAY_SIZE][SECTION_BLOCK_COUNT];
-        this.lightArrays = new DataLayer[SECTION_ARRAY_SIZE][LIGHT_TYPES.length];
-
-        this.blockEntityArrays = new Int2ReferenceMap[SECTION_ARRAY_SIZE];
-        this.blockEntityRenderDataArrays = new Int2ReferenceMap[SECTION_ARRAY_SIZE];
-
-        this.biomeSlice = new LevelBiomeSlice();
-        this.biomeColors = new LevelColorCache(this.biomeSlice, Minecraft.getInstance().options.biomeBlendRadius().get());
-
-        for (BlockState[] blockArray : this.blockArrays) {
-            Arrays.fill(blockArray, EMPTY_BLOCK_STATE);
-        }
+        this.defaultSkyLightValue = new int[LIGHT_TYPES.length];
+        this.defaultSkyLightValue[EnumSkyBlock.SKY.ordinal()] = WorldUtil.hasSkyLight(world.provider) ? EnumSkyBlock.SKY.defaultLightValue : 0;
+        this.defaultSkyLightValue[EnumSkyBlock.BLOCK.ordinal()] = EnumSkyBlock.BLOCK.defaultLightValue;
     }
 
     public void copyData(ChunkRenderContext context) {
@@ -171,7 +145,7 @@ public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, Ren
             }
         }
 
-        this.biomeSlice.update(this.level, context);
+        this.biomeSlice.update(this.world, context);
         this.biomeColors.update(context);
     }
 
@@ -256,7 +230,7 @@ public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, Ren
 
     @Override
     public float getShade(Direction direction, boolean shaded) {
-        return this.level.getShade(direction, shaded);
+        return this.world.getShade(direction, shaded);
     }
 
     @Override
@@ -340,12 +314,12 @@ public final class LevelSlice implements BlockAndTintGetter, BiomeColorView, Ren
 
     @Override
     public int getHeight() {
-        return this.level.getHeight();
+        return this.world.getHeight();
     }
 
     @Override
     public int getMinBuildHeight() {
-        return this.level.getMinBuildHeight();
+        return this.world.getMinBuildHeight();
     }
 
     @Override

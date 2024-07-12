@@ -17,4 +17,5 @@ public class TextureUtil {
     public static int getBlockTextureId() {
         return RenderSystem.getShaderTexture(0);
     }
+
 }

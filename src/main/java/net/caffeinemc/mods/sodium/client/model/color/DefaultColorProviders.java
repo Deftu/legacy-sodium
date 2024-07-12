@@ -3,7 +3,7 @@ package net.caffeinemc.mods.sodium.client.model.color;
 import net.caffeinemc.mods.sodium.client.model.quad.ModelQuadView;
 import net.caffeinemc.mods.sodium.client.model.quad.blender.BlendedColorProvider;
 import net.caffeinemc.mods.sodium.client.world.biome.BiomeColorSource;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.client.world.WorldSlice;
 import net.caffeinemc.mods.sodium.api.util.ColorARGB;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.minecraft.client.color.block.BlockColor;
@@ -29,7 +29,7 @@ public class DefaultColorProviders {
         }
 
         @Override
-        protected int getColor(LevelSlice slice, int x, int y, int z) {
+        protected int getColor(WorldSlice slice, int x, int y, int z) {
             return slice.getColor(BiomeColorSource.GRASS, x, y, z);
         }
     }
@@ -42,7 +42,7 @@ public class DefaultColorProviders {
         }
 
         @Override
-        protected int getColor(LevelSlice slice, int x, int y, int z) {
+        protected int getColor(WorldSlice slice, int x, int y, int z) {
             return slice.getColor(BiomeColorSource.FOLIAGE, x, y, z);
         }
     }
@@ -56,7 +56,7 @@ public class DefaultColorProviders {
         }
 
         @Override
-        protected int getColor(LevelSlice slice, int x, int y, int z) {
+        protected int getColor(WorldSlice slice, int x, int y, int z) {
             return slice.getColor(BiomeColorSource.WATER, x, y, z);
         }
     }
@@ -69,7 +69,7 @@ public class DefaultColorProviders {
         }
 
         @Override
-        public void getColors(LevelSlice slice, BlockPos pos, BlockState state, ModelQuadView quad, int[] output) {
+        public void getColors(WorldSlice slice, BlockPos pos, BlockState state, ModelQuadView quad, int[] output) {
             Arrays.fill(output, ColorARGB.toABGR(this.color.getColor(state, slice, pos, quad.getColorIndex())));
         }
     }
@@ -82,7 +82,7 @@ public class DefaultColorProviders {
         }
 
         @Override
-        public void getColors(LevelSlice slice, BlockPos pos, FluidState state, ModelQuadView quad, int[] output) {
+        public void getColors(WorldSlice slice, BlockPos pos, FluidState state, ModelQuadView quad, int[] output) {
             Arrays.fill(output, this.handler.getFluidColor(slice, pos, state));
         }
     }

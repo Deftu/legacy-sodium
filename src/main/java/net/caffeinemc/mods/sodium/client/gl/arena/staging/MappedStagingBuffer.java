@@ -67,8 +67,13 @@ public class MappedStagingBuffer implements StagingBuffer {
         if (length > remaining) {
             int split = length - remaining;
 
-            this.addTransfer(data.slice(0, remaining), dst, this.pos, writeOffset);
-            this.addTransfer(data.slice(remaining, split), dst, 0, writeOffset + remaining);
+            ByteBuffer slice = data.slice();
+            slice.limit(remaining);
+            this.addTransfer(slice, dst, this.pos, writeOffset);
+            slice = data.slice();
+            slice.position(remaining);
+            slice.limit(split);
+            this.addTransfer(slice, dst, 0, writeOffset + remaining);
 
             this.pos = split;
         } else {
@@ -142,8 +147,8 @@ public class MappedStagingBuffer implements StagingBuffer {
     @Override
     public void flip() {
         while (!this.fencedRegions.isEmpty()) {
-            var region = this.fencedRegions.first();
-            var fence = region.fence();
+            FencedMemoryRegion region = this.fencedRegions.first();
+            GlFence fence = region.fence();
 
             if (!fence.isCompleted()) {
                 break;
@@ -178,20 +183,54 @@ public class MappedStagingBuffer implements StagingBuffer {
         }
     }
 
-    private record MappedBuffer(GlImmutableBuffer buffer,
-                                GlBufferMapping map) {
+    private class MappedBuffer {
+
+        private final GlImmutableBuffer buffer;
+        private final GlBufferMapping map;
+
+        private MappedBuffer(GlImmutableBuffer buffer, GlBufferMapping map) {
+            this.buffer = buffer;
+            this.map = map;
+        }
+
         public void delete(CommandList commandList) {
             commandList.unmap(this.map);
             commandList.deleteBuffer(this.buffer);
         }
+
+        public GlImmutableBuffer buffer() {
+            return this.buffer;
+        }
+
+        public GlBufferMapping map() {
+            return this.map;
+        }
+
     }
 
-    private record FencedMemoryRegion(GlFence fence, int length) {
+    private class FencedMemoryRegion {
+
+        private final GlFence fence;
+        private final int length;
+
+        private FencedMemoryRegion(GlFence fence, int length) {
+            this.fence = fence;
+            this.length = length;
+        }
+
+        public GlFence fence() {
+            return this.fence;
+        }
+
+        public int length() {
+            return this.length;
+        }
 
     }
 
     @Override
     public String toString() {
-        return "Mapped (%s/%s MiB)".formatted(MathUtil.toMib(this.remaining), MathUtil.toMib(this.capacity));
+        return String.format("Mapped (%s/%s MiB)", MathUtil.toMib(this.remaining), MathUtil.toMib(this.capacity));
     }
+
 }

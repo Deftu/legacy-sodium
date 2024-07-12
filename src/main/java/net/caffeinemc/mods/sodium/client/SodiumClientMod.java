@@ -5,41 +5,27 @@ import net.caffeinemc.mods.sodium.client.data.fingerprint.HashedFingerprint;
 import net.caffeinemc.mods.sodium.client.gui.SodiumGameOptions;
 import net.caffeinemc.mods.sodium.client.gui.console.Console;
 import net.caffeinemc.mods.sodium.client.gui.console.message.MessageLevel;
-import net.caffeinemc.mods.sodium.client.render.frapi.SpriteFinderCache;
-import net.caffeinemc.mods.sodium.client.util.FlawlessFrames;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.resource.ResourceManagerHelper;
-import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.server.packs.PackType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.minecraft.util.ChatComponentText;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 
-public class SodiumClientMod implements ClientModInitializer {
-    private static SodiumGameOptions CONFIG;
-    private static Logger LOGGER;
+@Mod(modid = "legacy-sodium")
+public class SodiumClientMod {
 
+    private static Logger LOGGER = LogManager.getLogger("Sodium");
+
+    private static SodiumGameOptions CONFIG;
     private static String MOD_VERSION;
 
-    @Override
-    public void onInitializeClient() {
-        ModContainer mod = FabricLoader.getInstance()
-                .getModContainer("sodium")
-                .orElseThrow(NullPointerException::new);
-
-        MOD_VERSION = mod.getMetadata()
-                .getVersion()
-                .getFriendlyString();
-
-        LOGGER = LoggerFactory.getLogger("Sodium");
+    @Mod.EventHandler
+    public void onInitializeClient(FMLInitializationEvent event) {
         CONFIG = loadConfig();
-
-        FlawlessFrames.onClientInitialization();
-
-        ResourceManagerHelper.get(PackType.CLIENT_RESOURCES).registerReloadListener(SpriteFinderCache.ReloadListener.INSTANCE);
+        MOD_VERSION = Loader.instance().activeModContainer().getVersion();
 
         try {
             updateFingerprint();
@@ -64,22 +50,6 @@ public class SodiumClientMod implements ClientModInitializer {
         return LOGGER;
     }
 
-    private static SodiumGameOptions loadConfig() {
-        try {
-            return SodiumGameOptions.loadFromDisk();
-        } catch (Exception e) {
-            LOGGER.error("Failed to load configuration file", e);
-            LOGGER.error("Using default configuration file in read-only mode");
-
-            Console.instance().logMessage(MessageLevel.SEVERE, Component.translatable("sodium.console.config_not_loaded"), 12.5);
-
-            var config = SodiumGameOptions.defaults();
-            config.setReadOnly();
-
-            return config;
-        }
-    }
-
     public static void restoreDefaultOptions() {
         CONFIG = SodiumGameOptions.defaults();
 
@@ -98,8 +68,24 @@ public class SodiumClientMod implements ClientModInitializer {
         return MOD_VERSION;
     }
 
+    private static SodiumGameOptions loadConfig() {
+        try {
+            return SodiumGameOptions.loadFromDisk();
+        } catch (Exception e) {
+            LOGGER.error("Failed to load configuration file", e);
+            LOGGER.error("Using default configuration file in read-only mode");
+
+            Console.instance().logMessage(MessageLevel.SEVERE, new ChatComponentText("sodium.console.config_not_loaded"), 12.5);
+
+            SodiumGameOptions config = SodiumGameOptions.defaults();
+            config.setReadOnly();
+
+            return config;
+        }
+    }
+
     private static void updateFingerprint() {
-        var current = FingerprintMeasure.create();
+        FingerprintMeasure current = FingerprintMeasure.create();
 
         if (current == null) {
             return;
@@ -126,4 +112,5 @@ public class SodiumClientMod implements ClientModInitializer {
             }
         }
     }
+
 }

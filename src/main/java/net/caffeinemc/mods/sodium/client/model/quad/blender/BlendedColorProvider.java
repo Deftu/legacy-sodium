@@ -2,7 +2,7 @@ package net.caffeinemc.mods.sodium.client.model.quad.blender;
 
 import net.caffeinemc.mods.sodium.client.model.quad.ModelQuadView;
 import net.caffeinemc.mods.sodium.client.model.color.ColorProvider;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.client.world.WorldSlice;
 import net.caffeinemc.mods.sodium.api.util.ColorARGB;
 import net.caffeinemc.mods.sodium.api.util.ColorMixer;
 import net.minecraft.core.BlockPos;
@@ -10,13 +10,13 @@ import net.minecraft.util.Mth;
 
 public abstract class BlendedColorProvider<T> implements ColorProvider<T> {
     @Override
-    public void getColors(LevelSlice slice, BlockPos pos, T state, ModelQuadView quad, int[] output) {
+    public void getColors(WorldSlice slice, BlockPos pos, T state, ModelQuadView quad, int[] output) {
         for (int vertexIndex = 0; vertexIndex < 4; vertexIndex++) {
             output[vertexIndex] = this.getVertexColor(slice, pos, quad, vertexIndex);
         }
     }
 
-    private int getVertexColor(LevelSlice slice, BlockPos pos, ModelQuadView quad, int vertexIndex) {
+    private int getVertexColor(WorldSlice slice, BlockPos pos, ModelQuadView quad, int vertexIndex) {
         // Offset the position by -0.5f to align smooth blending with flat blending.
         final float posX = quad.getX(vertexIndex) - 0.5f;
         final float posY = quad.getY(vertexIndex) - 0.5f;
@@ -69,5 +69,5 @@ public abstract class BlendedColorProvider<T> implements ColorProvider<T> {
         return ColorARGB.toABGR(x0);
     }
 
-    protected abstract int getColor(LevelSlice slice, int x, int y, int z);
+    protected abstract int getColor(WorldSlice slice, int x, int y, int z);
 }

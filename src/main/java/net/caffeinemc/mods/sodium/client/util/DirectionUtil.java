@@ -1,24 +1,27 @@
 package net.caffeinemc.mods.sodium.client.util;
 
+import net.minecraft.util.EnumFacing;
+
 import java.util.Arrays;
-import net.minecraft.core.Direction;
 
 /**
  * Contains a number of cached arrays to avoid allocations since calling Enum#values() requires the backing array to
  * be cloned every time.
  */
 public class DirectionUtil {
-    public static final Direction[] ALL_DIRECTIONS = Direction.values();
+
+    public static final EnumFacing[] ALL_DIRECTIONS = EnumFacing.values();
 
     // Provides the same order as enumerating Direction and checking the axis of each value
-    public static final Direction[] HORIZONTAL_DIRECTIONS = new Direction[] { Direction.NORTH, Direction.SOUTH, Direction.WEST, Direction.EAST };
+    public static final EnumFacing[] HORIZONTAL_DIRECTIONS = new EnumFacing[] { EnumFacing.NORTH, EnumFacing.SOUTH, EnumFacing.WEST, EnumFacing.EAST };
 
-    private static final Direction[] OPPOSITE_DIRECTIONS = Arrays.stream(ALL_DIRECTIONS)
-            .map(Direction::getOpposite)
-            .toArray(Direction[]::new);
+    private static final EnumFacing[] OPPOSITE_DIRECTIONS = Arrays.stream(ALL_DIRECTIONS)
+            .map(EnumFacing::getOpposite)
+            .toArray(EnumFacing[]::new);
 
     // Direction#byId is slow in the absence of Lithium
-    public static Direction getOpposite(Direction dir) {
+    public static EnumFacing getOpposite(EnumFacing dir) {
         return OPPOSITE_DIRECTIONS[dir.ordinal()];
     }
+
 }

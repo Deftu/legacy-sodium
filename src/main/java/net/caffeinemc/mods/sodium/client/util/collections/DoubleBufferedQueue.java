@@ -18,7 +18,7 @@ public final class DoubleBufferedQueue<E> {
             return false;
         }
 
-        var tmp = this.read;
+        QueueImpl<E> tmp = this.read;
         this.read = this.write;
         this.write = tmp;
 

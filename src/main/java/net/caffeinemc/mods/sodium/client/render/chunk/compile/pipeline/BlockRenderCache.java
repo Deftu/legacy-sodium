@@ -3,7 +3,7 @@ package net.caffeinemc.mods.sodium.client.render.chunk.compile.pipeline;
 import net.caffeinemc.mods.sodium.client.model.color.ColorProviderRegistry;
 import net.caffeinemc.mods.sodium.client.model.light.LightPipelineProvider;
 import net.caffeinemc.mods.sodium.client.model.light.data.ArrayLightDataCache;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.client.world.WorldSlice;
 import net.caffeinemc.mods.sodium.client.world.cloned.ChunkRenderContext;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -16,11 +16,11 @@ public class BlockRenderCache {
     private final FluidRenderer fluidRenderer;
 
     private final BlockModelShaper blockModels;
-    private final LevelSlice levelSlice;
+    private final WorldSlice worldSlice;
 
     public BlockRenderCache(Minecraft minecraft, ClientLevel level) {
-        this.levelSlice = new LevelSlice(level);
-        this.lightDataCache = new ArrayLightDataCache(this.levelSlice);
+        this.worldSlice = new WorldSlice(level);
+        this.lightDataCache = new ArrayLightDataCache(this.worldSlice);
 
         LightPipelineProvider lightPipelineProvider = new LightPipelineProvider(this.lightDataCache);
 
@@ -46,14 +46,14 @@ public class BlockRenderCache {
 
     public void init(ChunkRenderContext context) {
         this.lightDataCache.reset(context.getOrigin());
-        this.levelSlice.copyData(context);
+        this.worldSlice.copyData(context);
     }
 
-    public LevelSlice getWorldSlice() {
-        return this.levelSlice;
+    public WorldSlice getWorldSlice() {
+        return this.worldSlice;
     }
 
     public void cleanup() {
-        this.levelSlice.reset();
+        this.worldSlice.reset();
     }
 }

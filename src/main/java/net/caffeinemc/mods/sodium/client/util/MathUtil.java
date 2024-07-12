@@ -1,6 +1,7 @@
 package net.caffeinemc.mods.sodium.client.util;
 
 public class MathUtil {
+
     /**
      * @return True if the specified number is greater than zero and is a power of two, otherwise false
      */
@@ -26,7 +27,8 @@ public class MathUtil {
         // // uses Float.compare to avoid issues comparing -0.0f and 0.0f
         // return Float.floatToRawIntBits(f) ^ (Float.compare(f, 0f) > 0 ? 0x80000000 : 0xffffffff);
 
-        var bits = Float.floatToRawIntBits(f);
+        int bits = Float.floatToRawIntBits(f);
         return bits ^ ((bits >> (BIT_COUNT - 1)) | FLIP_SIGN_MASK);
     }
+
 }

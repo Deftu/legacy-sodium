@@ -232,10 +232,10 @@ public class BitArray {
     }
 
     public boolean getAndUnset(int index) {
-        var wordIndex = wordIndex(index);
-        var bit = 1L << bitIndex(index);
+        int wordIndex = wordIndex(index);
+        long bit = 1L << bitIndex(index);
 
-        var word = this.words[wordIndex];
+        long word = this.words[wordIndex];
         this.words[wordIndex] = word & ~bit;
 
         return (word & bit) != 0;

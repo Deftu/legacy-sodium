@@ -4,9 +4,30 @@ import net.caffeinemc.mods.sodium.client.gl.attribute.GlVertexAttributeBinding;
 import net.caffeinemc.mods.sodium.client.gl.buffer.GlBuffer;
 import net.caffeinemc.mods.sodium.client.gl.buffer.GlBufferTarget;
 
-public record TessellationBinding(GlBufferTarget target,
-                                  GlBuffer buffer,
-                                  GlVertexAttributeBinding[] attributeBindings) {
+public class TessellationBinding {
+
+    private final GlBufferTarget target;
+    private final GlBuffer buffer;
+    private final GlVertexAttributeBinding[] attributeBindings;
+
+    public TessellationBinding(GlBufferTarget target, GlBuffer buffer, GlVertexAttributeBinding[] attributeBindings) {
+        this.target = target;
+        this.buffer = buffer;
+        this.attributeBindings = attributeBindings;
+    }
+
+    public GlBufferTarget target() {
+        return this.target;
+    }
+
+    public GlBuffer buffer() {
+        return this.buffer;
+    }
+
+    public GlVertexAttributeBinding[] attributeBindings() {
+        return this.attributeBindings;
+    }
+
     public static TessellationBinding forVertexBuffer(GlBuffer buffer, GlVertexAttributeBinding[] attributes) {
         return new TessellationBinding(GlBufferTarget.ARRAY_BUFFER, buffer, attributes);
     }

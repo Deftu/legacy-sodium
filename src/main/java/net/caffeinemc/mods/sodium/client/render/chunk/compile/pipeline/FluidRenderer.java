@@ -7,7 +7,7 @@ import net.caffeinemc.mods.sodium.client.render.chunk.compile.buffers.ChunkModel
 import net.caffeinemc.mods.sodium.client.render.chunk.terrain.material.DefaultMaterials;
 import net.caffeinemc.mods.sodium.client.render.chunk.terrain.material.Material;
 import net.caffeinemc.mods.sodium.client.render.chunk.translucent_sorting.TranslucentGeometryCollector;
-import net.caffeinemc.mods.sodium.client.world.LevelSlice;
+import net.caffeinemc.mods.sodium.client.world.WorldSlice;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandler;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.minecraft.core.BlockPos;
@@ -26,7 +26,7 @@ public class FluidRenderer {
         defaultRenderer = new DefaultFluidRenderer(colorProviderRegistry, lighters);
     }
 
-    public void render(LevelSlice level, BlockState blockState, FluidState fluidState, BlockPos blockPos, BlockPos offset, TranslucentGeometryCollector collector, ChunkBuildBuffers buffers) {
+    public void render(WorldSlice level, BlockState blockState, FluidState fluidState, BlockPos blockPos, BlockPos offset, TranslucentGeometryCollector collector, ChunkBuildBuffers buffers) {
         var material = DefaultMaterials.forFluidState(fluidState);
         var meshBuilder = buffers.get(material);
 
@@ -75,7 +75,7 @@ public class FluidRenderer {
 
     private static class DefaultRenderContext {
         private DefaultFluidRenderer renderer;
-        private LevelSlice level;
+        private WorldSlice level;
         private FluidState fluidState;
         private BlockPos blockPos;
         private BlockPos offset;
@@ -84,7 +84,7 @@ public class FluidRenderer {
         private Material material;
         private FluidRenderHandler handler;
 
-        public void setUp(DefaultFluidRenderer renderer, LevelSlice level, FluidState fluidState, BlockPos blockPos, BlockPos offset, TranslucentGeometryCollector collector, ChunkModelBuilder meshBuilder, Material material, FluidRenderHandler handler) {
+        public void setUp(DefaultFluidRenderer renderer, WorldSlice level, FluidState fluidState, BlockPos blockPos, BlockPos offset, TranslucentGeometryCollector collector, ChunkModelBuilder meshBuilder, Material material, FluidRenderHandler handler) {
             this.renderer = renderer;
             this.level = level;
             this.fluidState = fluidState;

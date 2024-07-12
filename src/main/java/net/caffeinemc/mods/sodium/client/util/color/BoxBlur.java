@@ -1,7 +1,7 @@
 package net.caffeinemc.mods.sodium.client.util.color;
 
 import net.caffeinemc.mods.sodium.api.util.ColorARGB;
-import net.minecraft.util.Mth;
+import net.minecraft.util.MathHelper;
 
 public class BoxBlur {
 
@@ -40,7 +40,7 @@ public class BoxBlur {
 
             // Extend the window forwards by sampling ahead N times
             for (int x = 1; x <= radius; x++) {
-                var color = src[srcRowOffset + x];
+                int color = src[srcRowOffset + x];
                 red += ColorARGB.unpackRed(color);
                 green += ColorARGB.unpackGreen(color);
                 blue += ColorARGB.unpackBlue(color);
@@ -52,7 +52,7 @@ public class BoxBlur {
 
                 {
                     // Remove the color values that are behind the window
-                    var color = src[srcRowOffset + Math.max(0, x - radius)];
+                    int color = src[srcRowOffset + Math.max(0, x - radius)];
 
                     red -= ColorARGB.unpackRed(color);
                     green -= ColorARGB.unpackGreen(color);
@@ -61,7 +61,7 @@ public class BoxBlur {
 
                 {
                     // Add the color values that are ahead of the window
-                    var color = src[srcRowOffset + Math.min(width - 1, x + radius + 1)];
+                    int color = src[srcRowOffset + Math.min(width - 1, x + radius + 1)];
                     red += ColorARGB.unpackRed(color);
                     green += ColorARGB.unpackGreen(color);
                     blue += ColorARGB.unpackBlue(color);
@@ -77,7 +77,7 @@ public class BoxBlur {
      * @author 2No2Name
      */
     private static int getAveragingMultiplier(int size) {
-        return Mth.ceil((1L << 24) / (double) size);
+        return MathHelper.ceiling_double_int((1L << 24) / (double) size);
     }
 
     /**

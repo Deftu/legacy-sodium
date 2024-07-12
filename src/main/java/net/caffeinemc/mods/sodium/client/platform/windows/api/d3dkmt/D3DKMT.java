@@ -1,29 +1,24 @@
 package net.caffeinemc.mods.sodium.client.platform.windows.api.d3dkmt;
 
-import com.sun.jna.platform.win32.VersionHelpers;
 import net.caffeinemc.mods.sodium.client.compatibility.environment.probe.GraphicsAdapterInfo;
 import net.caffeinemc.mods.sodium.client.compatibility.environment.probe.GraphicsAdapterVendor;
 import net.caffeinemc.mods.sodium.client.platform.windows.WindowsFileVersion;
 import net.caffeinemc.mods.sodium.client.platform.windows.api.Gdi32;
 import net.caffeinemc.mods.sodium.client.platform.windows.api.version.Version;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.system.MemoryStack;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.List;
 
 import static net.caffeinemc.mods.sodium.client.platform.windows.api.Gdi32.*;
 import static net.caffeinemc.mods.sodium.client.platform.windows.api.d3dkmt.D3DKMTQueryAdapterInfoType.WDDM12.*;
-import static org.lwjgl.system.MemoryUtil.memAddress;
-import static org.lwjgl.system.MemoryUtil.memByteBuffer;
 
 public class D3DKMT {
-    private static final Logger LOGGER = LoggerFactory.getLogger("Sodium-D3DKMT");
+    private static final Logger LOGGER = LogManager.getLogger("Sodium-D3DKMT");
 
     private static final boolean SUPPORTS_D3DKMT = VersionHelpers.IsWindowsVistaOrGreater() && Gdi32.isD3DKMTSupported();
     private static final boolean SUPPORTS_QUERYING_ADAPTER_TYPE = VersionHelpers.IsWindows8OrGreater();

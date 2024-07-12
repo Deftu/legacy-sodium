@@ -4,17 +4,11 @@ import it.unimi.dsi.fastutil.objects.Reference2ReferenceMap;
 import it.unimi.dsi.fastutil.objects.Reference2ReferenceOpenHashMap;
 import it.unimi.dsi.fastutil.objects.ReferenceSet;
 import net.caffeinemc.mods.sodium.client.model.color.interop.BlockColorsExtension;
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.level.material.Fluids;
 
 
 // TODO: Make the registry a global somewhere that is only initialized once after content load
 public class ColorProviderRegistry {
+
     private final Reference2ReferenceMap<Block, ColorProvider<BlockState>> blocks = new Reference2ReferenceOpenHashMap<>();
     private final Reference2ReferenceMap<Fluid, ColorProvider<FluidState>> fluids = new Reference2ReferenceOpenHashMap<>();
 
@@ -71,4 +65,5 @@ public class ColorProviderRegistry {
     public ColorProvider<FluidState> getColorProvider(Fluid fluid) {
         return this.fluids.get(fluid);
     }
+
 }
